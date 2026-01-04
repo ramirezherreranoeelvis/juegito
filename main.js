@@ -1095,8 +1095,8 @@ window.addEventListener("mouseup", () => (mouse.down = false));
 // --- Global Touch Helper (Aim & Attack) ---
 // This handles touches NOT used by the joystick
 function handleGlobalTouch(e) {
-      e.preventDefault(); // Prevent scrolling/zooming
-      if (!gameActive) return;
+      if (!gameActive) return; // Allow default UI interaction (scrolling, clicking) if game not active
+      e.preventDefault(); // Prevent scrolling/zooming ONLY during game
 
       let aimTouch = null;
 
