@@ -716,8 +716,15 @@ function startGame() {
       document.getElementById("scoreBoard").style.display = "block";
       document.getElementById("deathScreen").style.display = "none";
 
-      // Show mobile controls if on mobile
-      if (window.innerWidth <= 900) {
+      // Show mobile controls if on mobile (Touch supported)
+      const isTouchDevice =
+            "ontouchstart" in window || navigator.maxTouchPoints > 0;
+      if (isTouchDevice && window.innerWidth <= 1024) {
+            // Also check width to avoid tablets/laptops with touch being forced to mobile UI if we don't want it?
+            // Actually user asked "not on PC". Touch laptops exist.
+            // Better to stick to touch check primarily, maybe combined with width to be safe,
+            // but usually strictly touch check is what distinguishes "phone/tablet" mode for on-screen controls.
+            // Let's use touch check.
             document.getElementById("mobileControls").style.display = "block";
       }
 
