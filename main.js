@@ -22,6 +22,90 @@ let camera = { x: 0, y: 0 };
 // Input
 const keys = {};
 const mouse = { x: 0, y: 0, down: false, angle: 0 };
+const joystick = { x: 0, y: 0, active: false, id: null, tapTime: 0 };
+
+// --- Joystick Setup ---
+const joyZone = document.getElementById("joystick-zone");
+const joyKnob = document.getElementById("joystick-knob");
+
+if (joyZone) {
+      joyZone.addEventListener(
+            "touchstart",
+            (e) => {
+                  e.preventDefault();
+                  const touch = e.changedTouches[0];
+                  joystick.id = touch.identifier;
+                  joystick.active = true;
+
+                  // Double tap check
+                  const now = Date.now();
+                  if (now - joystick.tapTime < 300) {
+                        if (player) {
+                              player.isAttacking = true;
+                              player.attackTimer = 0;
+                        }
+                  }
+                  joystick.tapTime = now;
+
+                  updateJoystick(touch);
+            },
+            { passive: false }
+      );
+
+      joyZone.addEventListener(
+            "touchmove",
+            (e) => {
+                  e.preventDefault();
+                  if (!joystick.active) return;
+                  for (let i = 0; i < e.changedTouches.length; i++) {
+                        if (e.changedTouches[i].identifier === joystick.id) {
+                              updateJoystick(e.changedTouches[i]);
+                              break;
+                        }
+                  }
+            },
+            { passive: false }
+      );
+
+      const endJoystick = (e) => {
+            for (let i = 0; i < e.changedTouches.length; i++) {
+                  if (e.changedTouches[i].identifier === joystick.id) {
+                        joystick.active = false;
+                        joystick.id = null;
+                        joystick.x = 0;
+                        joystick.y = 0;
+                        joyKnob.style.transform = `translate(-50%, -50%)`;
+                        break;
+                  }
+            }
+      };
+
+      joyZone.addEventListener("touchend", endJoystick);
+      joyZone.addEventListener("touchcancel", endJoystick);
+}
+
+function updateJoystick(touch) {
+      const rect = joyZone.getBoundingClientRect();
+      const centerX = rect.left + rect.width / 2;
+      const centerY = rect.top + rect.height / 2;
+      const maxDist = rect.width / 2;
+
+      let dx = touch.clientX - centerX;
+      let dy = touch.clientY - centerY;
+      const dist = Math.hypot(dx, dy);
+
+      // Clamp visual
+      if (dist > maxDist) {
+            dx = (dx / dist) * maxDist;
+            dy = (dy / dist) * maxDist;
+      }
+
+      joyKnob.style.transform = `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px))`;
+
+      // Normalize output
+      joystick.x = dx / maxDist;
+      joystick.y = dy / maxDist;
+}
 
 // Entities
 let player = null;
@@ -688,6 +772,11 @@ function update() {
       if (keys["s"]) dy = 1;
       if (keys["a"]) dx = -1;
       if (keys["d"]) dx = 1;
+
+      if (joystick.active) {
+            dx = joystick.x;
+            dy = joystick.y;
+      }
 
       if (dx !== 0 || dy !== 0) {
             // Normalize speed

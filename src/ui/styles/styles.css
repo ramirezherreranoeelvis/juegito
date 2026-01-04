@@ -204,3 +204,49 @@ body {
       z-index: 20;
       pointer-events: auto;
 }
+
+/* Mobile Joystick */
+#mobileControls {
+      display: none;
+      position: absolute;
+      bottom: 50px;
+      left: 50px;
+      pointer-events: auto;
+      z-index: 100;
+}
+
+#joystick-zone {
+      width: 120px;
+      height: 120px;
+      background: rgba(0, 0, 0, 0.2);
+      border: 4px solid rgba(0, 0, 0, 0.5); /* Black outline */
+      border-radius: 50%;
+      position: relative;
+      touch-action: none;
+}
+
+#joystick-knob {
+      width: 50px;
+      height: 50px;
+      background: rgba(255, 255, 255, 0.8);
+      border: 2px solid #000; /* Inner border */
+      border-radius: 50%;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+}
+
+@media (max-width: 900px) {
+      #mobileControls {
+            display: block;
+      }
+      #resources {
+            top: 20px;
+            bottom: auto; /* Move resources up on mobile */
+      }
+      #stats {
+            bottom: 120px;
+      }
+}
