@@ -2,6 +2,41 @@
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
+// --- Skin Selection ---
+const SKIN_COLORS = ["#e0b58c", "#8d5524", "#ffffff", "#000000", "#e03e3e"];
+let selectedColor = SKIN_COLORS[0];
+
+function initSkinSelection() {
+      const container = document.getElementById("skinSelection");
+      if (!container) return;
+      container.innerHTML = "";
+      SKIN_COLORS.forEach((color) => {
+            const el = document.createElement("div");
+            el.className = "skin-option";
+            el.style.backgroundColor = color;
+            el.onclick = () => {
+                  selectedColor = color;
+                  updateSkinSelection();
+            };
+            container.appendChild(el);
+      });
+      updateSkinSelection();
+}
+
+function updateSkinSelection() {
+      const options = document.querySelectorAll(".skin-option");
+      options.forEach((el, i) => {
+            if (SKIN_COLORS[i] === selectedColor) {
+                  el.classList.add("selected");
+            } else {
+                  el.classList.remove("selected");
+            }
+      });
+}
+
+// Initialize immediately
+initSkinSelection();
+
 let width, height;
 const MAP_SIZE = 2000;
 
@@ -33,6 +68,7 @@ if (joyZone) {
             "touchstart",
             (e) => {
                   e.preventDefault();
+                  if (!gameActive) return; // Block input if game not active
                   const touch = e.changedTouches[0];
                   joystick.id = touch.identifier;
                   joystick.active = true;
@@ -363,8 +399,8 @@ class Building extends Entity {
 }
 
 class Character extends Entity {
-      constructor(x, y, name, isBot = false) {
-            super(x, y, 35, "#e0b58c"); // Skin color
+      constructor(x, y, name, color = "#e0b58c", isBot = false) {
+            super(x, y, 35, color);
             this.id = Math.random().toString(36).substr(2, 9);
             this.name = name;
             this.isBot = isBot;
@@ -562,7 +598,13 @@ class Bot extends Character {
                   "Guest_92",
                   "FarmerJoe",
             ];
-            super(x, y, names[Math.floor(Math.random() * names.length)], true);
+            super(
+                  x,
+                  y,
+                  names[Math.floor(Math.random() * names.length)],
+                  "#e0b58c",
+                  true
+            );
             this.target = null;
             this.moveDir = Math.random() * Math.PI * 2;
             this.moveTimer = 0;
@@ -674,8 +716,13 @@ function startGame() {
       document.getElementById("scoreBoard").style.display = "block";
       document.getElementById("deathScreen").style.display = "none";
 
+      // Show mobile controls if on mobile
+      if (window.innerWidth <= 900) {
+            document.getElementById("mobileControls").style.display = "block";
+      }
+
       // Setup Player
-      player = new Character(MAP_SIZE / 2, MAP_SIZE / 2, nick);
+      player = new Character(MAP_SIZE / 2, MAP_SIZE / 2, nick, selectedColor);
       player.resources = { wood: 0, stone: 0, food: 0 };
 
       // Build Action Bar UI
@@ -715,8 +762,11 @@ function gameOver() {
       gameActive = false;
       document.getElementById("finalScore").innerText =
             "Score: " + Math.floor(player.score);
+      document.getElementById("finalScore").innerText =
+            "Score: " + Math.floor(player.score);
       document.getElementById("deathScreen").style.display = "flex";
       document.getElementById("uiLayer").style.pointerEvents = "auto";
+      document.getElementById("mobileControls").style.display = "none"; // Hide controls
 }
 
 function selectItem(index) {
@@ -1046,6 +1096,7 @@ window.addEventListener("mouseup", () => (mouse.down = false));
 // This handles touches NOT used by the joystick
 function handleGlobalTouch(e) {
       e.preventDefault(); // Prevent scrolling/zooming
+      if (!gameActive) return;
 
       let aimTouch = null;
 

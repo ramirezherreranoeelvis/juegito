@@ -239,9 +239,7 @@ body {
 }
 
 @media (max-width: 900px) {
-      #mobileControls {
-            display: block;
-      }
+      /* Mobile specific adjustments */
       #resources {
             top: 20px;
             bottom: auto; /* Move resources up on mobile */
@@ -249,4 +247,24 @@ body {
       #stats {
             bottom: 120px;
       }
+}
+
+/* Skin Selection */
+.skin-option {
+      width: 25px;
+      height: 25px;
+      border-radius: 50%;
+      cursor: pointer;
+      border: 3px solid transparent;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+      transition: transform 0.1s;
+}
+
+.skin-option:hover {
+      transform: scale(1.1);
+}
+
+.skin-option.selected {
+      border-color: #88cc44;
+      transform: scale(1.2);
 }
