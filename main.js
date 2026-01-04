@@ -1102,8 +1102,17 @@ window.addEventListener("mouseup", () => (mouse.down = false));
 // --- Global Touch Helper (Aim & Attack) ---
 // This handles touches NOT used by the joystick
 function handleGlobalTouch(e) {
-      if (!gameActive) return; // Allow default UI interaction (scrolling, clicking) if game not active
-      e.preventDefault(); // Prevent scrolling/zooming ONLY during game
+      if (!gameActive) return; // Allow default UI interaction if game not active
+
+      // Check if touching UI logic (Item slots, etc.)
+      // Note: touchstart on an element will still propagate to window unless stopped.
+      // But we want to allow the "click" to happen.
+      // Easiest is to check if target is inside an .item-slot or .btn
+      if (e.target.closest(".item-slot") || e.target.closest(".btn")) {
+            return;
+      }
+
+      e.preventDefault(); // Prevent scrolling/zooming ONLY during game logic
 
       let aimTouch = null;
 
