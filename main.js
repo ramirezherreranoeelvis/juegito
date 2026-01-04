@@ -1041,3 +1041,33 @@ window.addEventListener("mousemove", (e) => {
 });
 window.addEventListener("mousedown", () => (mouse.down = true));
 window.addEventListener("mouseup", () => (mouse.down = false));
+
+// --- Global Touch Helper (Aim & Attack) ---
+// This handles touches NOT used by the joystick
+function handleGlobalTouch(e) {
+      e.preventDefault(); // Prevent scrolling/zooming
+
+      let aimTouch = null;
+
+      // Find the last touch that IS NOT the joystick
+      for (let i = 0; i < e.touches.length; i++) {
+            const t = e.touches[i];
+            if (t.identifier !== joystick.id) {
+                  aimTouch = t;
+            }
+      }
+
+      if (aimTouch) {
+            mouse.x = aimTouch.clientX;
+            mouse.y = aimTouch.clientY;
+            mouse.down = true;
+      } else {
+            // No action touches -> stop attacking
+            mouse.down = false;
+      }
+}
+
+window.addEventListener("touchstart", handleGlobalTouch, { passive: false });
+window.addEventListener("touchmove", handleGlobalTouch, { passive: false });
+window.addEventListener("touchend", handleGlobalTouch, { passive: false });
+window.addEventListener("touchcancel", handleGlobalTouch, { passive: false });
